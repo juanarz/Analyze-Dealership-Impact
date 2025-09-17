@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fountain Forward Analytics Dashboard</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .metric-card {
+            border-left: 4px solid #4e73df;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 20px;
+            background: #f8f9fc;
+        }
+        .metric-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2e59d9;
+        }
+        .metric-label {
+            font-size: 14px;
+            color: #5a5c69;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+        .chart-container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        }
+        body {
+            background-color: #f8f9fc;
+            padding: 20px;
+        }
+        .dashboard-header {
+            background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <!-- Header -->
+        <div class="dashboard-header">
+            <h1>Fountain Forward Analytics Dashboard</h1>
+            <p class="lead">Dealership Performance Overview</p>
+        </div>
+
+        <!-- KPI Cards -->
+        <div class="row mb-4">
+            <div class="col-md-2">
+                <div class="metric-card">
+                    <div class="metric-value" id="total-leads">1,280</div>
+                    <div class="metric-label">Total Leads</div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="metric-card">
+                    <div class="metric-value" id="total-appts">440</div>
+                    <div class="metric-label">Appointments Set</div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="metric-card">
+                    <div class="metric-value" id="total-sales">183</div>
+                    <div class="metric-label">Total Sales</div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="metric-card">
+                    <div class="metric-value" id="conversion-rate">14.3%</div>
+                    <div class="metric-label">Conversion Rate</div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="metric-card">
+                    <div class="metric-value" id="total-cost">$112,255</div>
+                    <div class="metric-label">Total Cost</div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="metric-card">
+                    <div class="metric-value" id="total-profit">$127,370</div>
+                    <div class="metric-label">Total Profit</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Funnel Chart -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="chart-container">
+                    <h4>Sales Funnel</h4>
+                    <div id="funnel-chart"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Monthly Comparison -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <h4>Monthly Performance</h4>
+                    <div id="monthly-chart"></div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <h4>Cost Analysis</h4>
+                    <div id="cost-chart"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample data - replace with your actual data
+        const months = ['January', 'February', 'March', 'April', 'May'];
+        const leads = [250, 359, 412, 587, 921];
+        const appts = [85, 120, 185, 240, 320];
+        const sales = [32, 47, 65, 89, 136];
+        const costs = [48000, 57660, 62000, 58000, 54595];
+        const profits = [25000, 11963, 35000, 45000, 115407];
+
+        // Funnel Chart
+        const funnelData = [{
+            type: 'funnel',
+            name: 'Funnel',
+            y: ['Leads', 'Appointments', 'Sales'],
+            x: [Math.max(...leads), Math.max(...appts), Math.max(...sales)],
+            textinfo: 'value+percent initial',
+            opacity: 0.8,
+            marker: {
+                color: ['#4e73df', '#36b9cc', '#1cc88a'],
+                line: { width: 4, color: '#fff' }
+            },
+            textfont: { size: 14 },
+            textposition: 'inside'
+        }];
+
+        const funnelLayout = {
+            margin: { t: 0, b: 0, l: 0, r: 0 },
+            showlegend: false,
+            height: 300
+        };
+
+        Plotly.newPlot('funnel-chart', funnelData, funnelLayout);
+
+        // Monthly Performance Chart
+        const monthlyData = [
+            {
+                x: months,
+                y: leads,
+                name: 'Leads',
+                type: 'bar',
+                marker: { color: '#4e73df' }
+            },
+            {
+                x: months,
+                y: appts,
+                name: 'Appointments',
+                type: 'bar',
+                marker: { color: '#36b9cc' }
+            },
+            {
+                x: months,
+                y: sales,
+                name: 'Sales',
+                type: 'bar',
+                marker: { color: '#1cc88a' }
+            }
+        ];
+
+        const monthlyLayout = {
+            barmode: 'group',
+            margin: { t: 0, b: 40, l: 40, r: 0 },
+            legend: { orientation: 'h', y: -0.15 },
+            height: 300
+        };
+
+        Plotly.newPlot('monthly-chart', monthlyData, monthlyLayout);
+
+        // Cost Analysis Chart
+        const costData = [
+            {
+                x: months,
+                y: costs,
+                name: 'Costs',
+                type: 'bar',
+                marker: { color: '#e74a3b' }
+            },
+            {
+                x: months,
+                y: profits,
+                name: 'Profit',
+                type: 'bar',
+                marker: { color: '#1cc88a' }
+            }
+        ];
+
+        const costLayout = {
+            barmode: 'group',
+            margin: { t: 0, b: 40, l: 40, r: 0 },
+            legend: { orientation: 'h', y: -0.15 },
+            height: 300,
+            yaxis: {
+                tickprefix: '$',
+                tickformat: ',.0f'
+            }
+        };
+
+        Plotly.newPlot('cost-chart', costData, costLayout);
+
+        // Update metrics with the latest month's data
+        document.getElementById('total-leads').textContent = leads[leads.length - 1].toLocaleString();
+        document.getElementById('total-appts').textContent = appts[appts.length - 1].toLocaleString();
+        document.getElementById('total-sales').textContent = sales[sales.length - 1].toLocaleString();
+        document.getElementById('conversion-rate').textContent = 
+            ((sales[sales.length - 1] / leads[leads.length - 1]) * 100).toFixed(1) + '%';
+        document.getElementById('total-cost').textContent = '$' + costs[costs.length - 1].toLocaleString();
+        document.getElementById('total-profit').textContent = '$' + profits[profits.length - 1].toLocaleString();
+    </script>
+</body>
+</html>
